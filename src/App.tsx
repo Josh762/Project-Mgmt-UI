@@ -1,10 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import {Auth} from './Auth';
-import {Products} from "./Products";
-import { createStore } from 'redux';
-// const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+import {
+    BrowserRouter as Router, Switch, Route
+} from 'react-router-dom';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import Home from './pages/Home';
+
 
 const reducer = (state:any) => {
   return state;
@@ -15,12 +18,20 @@ const reducer = (state:any) => {
 // );
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Auth/>
-        {/*<Products/>*/}
-      </header>
-    </div>
+      <Router>
+          <Switch>
+              <Route path='/signin'>
+                <SignIn></SignIn>
+              </Route>
+              <Route path='/signup'>
+                <SignUp></SignUp>
+              </Route>
+              <Route path='/home'>
+                <Home></Home>
+              </Route>
+          </Switch>
+      </Router>
+
   );
 }
 

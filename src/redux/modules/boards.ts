@@ -1,8 +1,24 @@
 import axios from 'axios';
 import { Dispatch, AnyAction } from 'redux';
+import Any = jasmine.Any;
 
-interface Board {
 
+// todo all interfaces needs to go in their own file/folder
+interface BoardDetails {
+  _id: string;
+  title: string;
+  workflow: Workflow;
+}
+
+interface Workflow {
+  userID: string;
+  type: string;
+  nodes: Task[];
+}
+
+interface Task {
+  title: string;
+  description: string;
 }
 
 interface HttpError {
@@ -31,34 +47,36 @@ const initialState: BoardsState = {
 
 };
 
-// export const loginSuccess = (user:User) => {
-//   return typedAction('user/LOGIN_SUCCESS', user);
-// };
-//
-// export const loginFailure = (error:HttpError) => {
-//   return typedAction('user/LOGIN_FAILURE', error);
-// };
-//
-// export const registerSuccess = (user:User) => {
-//   return typedAction('user/REGISTER_SUCCESS', user);
-// };
-//
-// export const registerFailure = (error:HttpError) => {
-//   return typedAction('user/REGISTER_FAILURE', error)
-// };
+
+
+export const fetchBoardDetails = (boardId:string) => {
+  return (dispatch: Dispatch<AnyAction>) => {
+    axios.get<BoardDetails>(`http://localhost:3001/api/v1/boards/${boardId}`)
+        .then((resp) => {
+          dispatch(
+              fetchBoardStubsSuccess()
+          );
+          console.log(resp.data);
+        }).catch((err) => {
+          dispatch(
+              fetchBoardStubsFailure(err.response.data)
+          );
+    })
+  }
+}
 
 export const fetchBoardStubs = () => {
   // return typedAction('user/LOGIN', username);
   return (dispatch: Dispatch<AnyAction>) => {
-    axios.get<Board>('https://localhost:3000/api/v1/workflows')
+    axios.get<BoardDetails>('http://localhost:3000/api/v1/boards')
       .then((u) => {
       console.log(u)
       dispatch(
-        fetchStubsSuccess() // todo send data
+          fetchBoardDetailsSuccess() // todo send data
       )
     }).catch((err) => {
       dispatch(
-        fetchStubsFailure(err.response.data)
+          fetchBoardDetailsFailure(err.response.data)
       )
     });
   }
@@ -67,64 +85,61 @@ export const fetchBoardStubs = () => {
 export const createWorkflow = () => {
   // return typedAction('user/LOGIN', username);
   return (dispatch: Dispatch<AnyAction>) => {
-    axios.post<Board>('https://localhost:3000/api/v1/workflows', {
+    axios.post<BoardDetails>('http://localhost:3000/api/v1/workflows', {
       "type": 'board'
-    },{withCredentials: true})
+    },{})
       .then((u) => {
         console.log(u)
         dispatch(
-          fetchStubsSuccess() // todo send data
+            fetchBoardStubsSuccess() // todo send data
         )
       }).catch((err) => {
       dispatch(
-        fetchStubsFailure(err.response.data)
+          fetchBoardStubsFailure(err.response.data)
       )
     });
   }
 };
 
-export const fetchStubsSuccess = () => {
-  return typedAction('boards/FETCH_STUBS_SUCCESS')
+
+const fetchDetailsSuccess = 'boards/FETCH_BOARD_DETAILS_SUCCESS';
+const fetchDetailsFailure = 'boards/FETCH_BOARD_DETAILS_FAILURE';
+
+const fetchStubsSuccess = 'boards/FETCH_BOARD_STUBS_SUCCESS';
+const fetchStubsFailure = 'boards/FETCH_STUBS_FAILURE';
+
+export const fetchBoardDetailsSuccess = () => {
+  return typedAction(fetchDetailsSuccess)
 }
 
-export const fetchStubsFailure = (error:HttpError) => {
-  return typedAction('boards/FETCH_STUBS_FAILURE', error)
+export const fetchBoardDetailsFailure = (error:HttpError) => {
+  return typedAction(fetchDetailsFailure, error);
 }
-// export const registerNewUser = (user:CreateUser) => {
-//
-//   return (dispatch: Dispatch<AnyAction>) => {
-//     axios.post<any>('http://localhost:3000/api/v1/auth/register', user)
-//       .then((response) => {
-//         dispatch(
-//           registerSuccess(response.data)
-//         )
-//       }).catch((err) => {
-//       dispatch(
-//         registerFailure(err.response.data)
-//       )
-//     })
-//   }
-// }
 
+export const fetchBoardStubsSuccess = () => {
+  return typedAction(fetchStubsSuccess);
+}
 
+export const fetchBoardStubsFailure = (error:HttpError) => {
+  return typedAction(fetchStubsFailure, error)
+}
 
-
-export const logout = () => {
-  return typedAction('user/LOGOUT');
-};
-
-
-type UserAction = ReturnType<typeof fetchStubsSuccess | typeof fetchStubsFailure>;
+type UserAction = ReturnType<typeof fetchBoardDetailsSuccess | typeof fetchBoardDetailsFailure | typeof fetchBoardStubsSuccess | typeof fetchBoardStubsFailure>;
 export function userReducer(
   state = initialState,
   action: UserAction
 ): BoardsState {
   switch (action.type) {
-    case 'boards/FETCH_STUBS_SUCCESS':
+    case fetchDetailsSuccess:
       return { ...state, error: null };
-    case 'boards/FETCH_STUBS_FAILURE':
+    case fetchDetailsFailure:
+      return { ...state, error: action.payload };
+    case fetchStubsSuccess:
+      return { ...state, error: null };
+    case fetchStubsFailure:
       return { ...state, error: action.payload};
     default:
       return state;
   }
 }
+

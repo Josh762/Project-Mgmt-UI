@@ -1,5 +1,5 @@
 // TODO: We should move typedAction elsewhere since it's shared
-import { typedAction } from './user';
+import { typedAction } from './auth';
 import { Dispatch, AnyAction } from 'redux';
 type Product = {
   id: number;

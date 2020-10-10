@@ -1,14 +1,19 @@
 import axios from 'axios';
 import { Dispatch, AnyAction } from 'redux';
 
-interface User {
+interface LoginSuccessResponse {
+	user: Auth;
+	jwt: string;
+}
+
+interface Auth {
 	username?: string;
-	firstname?: string;
-	lastname?: string;
+	firstName?: string;
+	lastName?: string;
 	email: string
 }
 
-interface CreateUser extends User {
+interface CreateUser extends Auth {
 	password: string;
 }
 
@@ -30,7 +35,8 @@ export function typedAction(type: string, payload?: any) {
 
 type UserState = {
 	username: string | null;
-	user: User;
+	user: Auth;
+	jwt: string;
 	error?: HttpError | null;
 };
 
@@ -38,16 +44,17 @@ type UserState = {
 
 const initialState: UserState = {
 	username: null,
+	jwt: "",
 	user: {
 		username: "",
 		email: "",
-		firstname: "",
-		lastname: "",
+		firstName: "",
+		lastName: "",
 	},
 	error: null
 };
 
-export const loginSuccess = (user:User) => {
+export const loginSuccess = (user:LoginSuccessResponse) => {
 	return typedAction('user/LOGIN_SUCCESS', user);
 };
 
@@ -55,7 +62,7 @@ export const loginFailure = (error:HttpError) => {
 	return typedAction('user/LOGIN_FAILURE', error);
 };
 
-export const registerSuccess = (user:User) => {
+export const registerSuccess = (user:Auth) => {
 	return typedAction('user/REGISTER_SUCCESS', user);
 };
 
@@ -66,14 +73,10 @@ export const registerFailure = (error:HttpError) => {
 export const login = (username: string) => {
 	// return typedAction('user/LOGIN', username);
 	return (dispatch: Dispatch<AnyAction>) => {
-		axios.post<User>('https://localhost:3000/api/v1/auth/login/',{
+		axios.post<LoginSuccessResponse>('http://localhost:3000/api/v1/auth/login',{
 			"username": username,
 			"password": "1123"
-		}
-		// 	{withCredentials: true
-		//
-		// }
-		).then((u) => {
+		}).then((u) => {
 			console.log(u)
 			dispatch(
 				loginSuccess(u.data)
@@ -89,7 +92,7 @@ export const login = (username: string) => {
 export const registerNewUser = (user:CreateUser) => {
 
 	return (dispatch: Dispatch<AnyAction>) => {
-		axios.post<any>('https://localhost:3000/api/v1/auth/register', user)
+		axios.post<any>('http://localhost:3000/api/v1/auth/register', user)
 			.then((response) => {
 				dispatch(
 					registerSuccess(response.data)
@@ -115,7 +118,7 @@ export function userReducer(
 ): UserState {
 	switch (action.type) {
 		case 'user/LOGIN_SUCCESS':
-			return { ...state, user: action.payload, error: null };
+			return { ...state, user: action.payload.user, jwt: action.payload.jwt,  error: null };
 		case 'user/LOGIN_FAILURE':
 			return { ...state, error: action.payload};
 		case 'user/REGISTER_SUCCESS':

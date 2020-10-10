@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import { RootState } from './redux';
-import {login, logout} from './redux/modules/user';
+import { RootState } from './redux/root-reducer';
+import {login, logout} from './redux/modules/auth';
 import {fetchBoardStubs, createWorkflow} from './redux/modules/boards';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -36,12 +36,17 @@ const UnconnectedAuth: React.FC<Props> = props => {
     // props.bindActionReactors.attemptLogin(username)
   }
 
+  const logout = () => {
+    localStorage.clear();
+  }
+
 
   return (<>
     <input type="text" value={username} onChange={e=> setUsername(e.target.value)}/>
     <button onClick={() => props.login(username)}>login</button>
     <button onClick={() => props.fetchBoardStubs()}>stubby</button>
     <button onClick={() => props.createWorkflow()}>workflow</button>
+    <button onClick={() => logout()}>logout</button>
     {props.error ? <span>{props.error.message}</span> : <span>Hello, {props.user.email}</span>}
     </>);
 };

@@ -2,19 +2,29 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import { rootReducer } from './redux';
-import thunk from 'redux-thunk';
-import { Auth } from './Auth';
-import { composeWithDevTools } from 'redux-devtools-extension';
 
-const store = createStore(rootReducer, composeWithDevTools(
-  applyMiddleware(thunk)
-));
+import {PersistGate} from "redux-persist/integration/react"; // defaults to localStorage for web
+
+
+import { store, persistor } from './redux/redux-config';
+
+// const persistConfig = {
+//     key: 'root',
+//     storage,
+// }
+
+// const persistedReducer = persistReducer(persistConfig, rootReducer)
+
+
+// const store = createStore(rootReducer, composeWithDevTools(
+//   applyMiddleware(thunk)
+// ));
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+      <PersistGate loading={null} persistor={persistor}>
+          <App />
+      </PersistGate>
   </Provider>,
   document.getElementById('root')
 );

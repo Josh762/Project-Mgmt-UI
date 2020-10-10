@@ -1,5 +1,5 @@
 import React from 'react';
-import { RootState } from './redux';
+import { RootState } from './redux/root-reducer';
 import { loadProducts } from './redux/modules/products';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
