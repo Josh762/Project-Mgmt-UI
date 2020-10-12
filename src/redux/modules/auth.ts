@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Dispatch, AnyAction } from 'redux';
+import { typedAction } from "../types/typed-action.interface";
 
 interface LoginSuccessResponse {
 	user: Auth;
@@ -20,17 +21,6 @@ interface CreateUser extends Auth {
 interface HttpError {
 	message: string;
 	status: number;
-}
-
-export function typedAction<T extends string>(type: T): { type: T };
-
-export function typedAction<T extends string, P extends any>(
-	type: T,
-	payload: P
-): { type: T; payload: P };
-
-export function typedAction(type: string, payload?: any) {
-	return { type, payload };
 }
 
 type UserState = {
